@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Light Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.2.8/mqtt.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen">
+    <h1 class="text-3xl font-bold mb-5">MQTT Light Control</h1>
+    <div class="relative">
+        <div id="light" class="w-32 h-32 bg-gray-500 rounded-full shadow-md transition-all"></div>
+    </div>
+    <p id="status" class="mt-4 text-lg">Status: OFF</p>
+    <div class="mt-4 space-x-4">
+        <button onclick="sendMQTT('ON')" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-lg">Turn ON</button>
+        <button onclick="sendMQTT('OFF')" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg">Turn OFF</button>
+    </div>
+
+    <script>
+        const client = mqtt.connect("wss://test.mosquitto.org:8081/mqtt");
+
+        client.on("connect", function () {
+            console.log("Connected to MQTT broker");
+        });
+
+        function sendMQTT(command) {
+            client.publish("/student_group/light_control", command);
+            document.getElementById("status").innerText = `Status: ${command}`;
+            document.getElementById("light").className = command === "ON" ? 
+                "w-32 h-32 bg-yellow-400 rounded-full shadow-lg transition-all animate-pulse" :
+                "w-32 h-32 bg-gray-500 rounded-full shadow-md transition-all";
+        }
+    </script>
+</body>
+</html>
